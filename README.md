@@ -370,6 +370,7 @@ les conversations depuis l'interface CLI d'Upstash :
 
 <p>&nbsp;</p>
 
+
 #### Et dans la vraie vie, ça marche comment ?
 
 Les applications de messagerie telles que WhatsApp utilisent du chiffrement de bout en bout, abrégé E2EE (pour End to End Encryption).<br/>
@@ -382,3 +383,5 @@ Voici quelques ressources intéressantes :
 
 
 <p>&nbsp;</p>
+
+-test
