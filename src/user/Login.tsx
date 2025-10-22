@@ -3,7 +3,7 @@ import { loginUser } from "./loginApi";
 import { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
 import userStore from "../stores/userStore";
-export function Login() {
+export default function Login() {
   const [error, setError] = useState({} as CustomError);
   const [session, setSession] = useState({} as Session);
   const { username, setUsername } = userStore();

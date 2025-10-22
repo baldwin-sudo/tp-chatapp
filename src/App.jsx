@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router";
 import "./App.css";
-import { Login } from "./user/Login";
+import Login from "./user/Login";
 import NotFound from "./Pages/NotFound";
 import NavBar from "./Components/NavBar";
 import Inscription from "./user/Inscription";

@@ -3,7 +3,7 @@ import { loginUser } from "./loginApi";
 import { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
 import userStore from "../stores/userStore";
-export function Inscription() {
+export default function Inscription() {
   const [error, setError] = useState({} as CustomError);
   const [session, setSession] = useState({} as Session);
   const { username, setUsername } = userStore();
