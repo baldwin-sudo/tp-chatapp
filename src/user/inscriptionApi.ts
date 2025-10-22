@@ -1,10 +1,10 @@
 import {Session, SessionCallback, ErrorCallback, User} from "../model/common";
 import {CustomError} from "../model/CustomError";
 
-export function loginUser(user: User, onResult: SessionCallback, onError: ErrorCallback) {
-    fetch("/api/auth/login",
+export function inscriptionUser(user: User, onResult: SessionCallback, onError: ErrorCallback) {
+    fetch("/api/auth/inscription",
         {
-            method: "POST", // ou 'PUT'
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -12,14 +12,12 @@ export function loginUser(user: User, onResult: SessionCallback, onError: ErrorC
         })
         .then(async (response) => {
             if (response.ok) {
-                console.log("response ok:",response)
                 const session = await response.json() as Session;
                 sessionStorage.setItem('token', session.token);
                 sessionStorage.setItem('externalId', session.externalId);
                 sessionStorage.setItem('username', session.username || "");
                 onResult(session)
             } else {
-                  console.log("response  err:",response)
                 const error = await response.json() as CustomError;
                 onError(error);
             }
