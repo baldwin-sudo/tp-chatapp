@@ -3,7 +3,7 @@ import { loginUser } from "./loginApi";
 import { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
 import userStore from "../stores/userStore";
-export function Login() {
+export function Inscription() {
   const [error, setError] = useState({} as CustomError);
   const [session, setSession] = useState({} as Session);
   const { username, setUsername } = userStore();
@@ -38,7 +38,7 @@ export function Login() {
   return (
     <div className="flex  flex-col justify-center items-center gap-5  border-blue-500 w-fit p-4 mx-auto ">
       <h1 className="font-bold text-blue-700 border-b-2 text-xl ">
-        Authentication
+        Inscription
       </h1>
       <form
         className="w-fit   mx-auto  flex flex-col items-center justify-center gap-5"
@@ -54,7 +54,18 @@ export function Login() {
             placeholder="..."
           />
         </label>
-        <br />
+        <label className="flex flex-col group" htmlFor="login">
+          <p className="font-semibold transition-colors duration-200 group-focus-within:text-blue-500">
+            Email address
+          </p>
+          <input
+            className=" rounded-sm border border-b-3 rounded-br-xl outline-0 px-2 py-1 focus:scale-105 focus:border-blue-500 focus:text-blue-600 transition-all duration-200 placeholder:text-neutral-400 "
+            name="login"
+            type="email"
+            placeholder="..."
+          />
+        </label>
+
         <label className="flex flex-col group" htmlFor="password">
           <p className="font-semibold transition-colors duration-200 group-focus-within:text-blue-500">
             Password
@@ -71,7 +82,7 @@ export function Login() {
           className="bg-blue-700 font-semibold text-white px-4 py-2 rounded-sm hover:scale-110 transition-all duration-200 hover:opacity-80"
           type="submit"
         >
-          connexion
+          créer un compte
         </button>
       </form>
       {session.token && (
