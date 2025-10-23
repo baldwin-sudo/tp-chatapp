@@ -1,8 +1,17 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router";
+import globalStore from "../stores/globalStore";
 
 export default function NavBar() {
-  const isLoggedIn = false;
+  const { clearSession } = globalStore();
+  const disconnect = () => {
+    clearSession();
+    sessionStorage.clear();
+    navigate("/login");
+    //clear session storage
+  };
+  const { session } = globalStore();
+  const isLoggedIn = session.token != "";
   const navigate = useNavigate();
   return (
     <div className=" sticky  top-0 z-50">
@@ -18,7 +27,7 @@ export default function NavBar() {
                 onClick={() => {
                   navigate("/login");
                 }}
-                className="mx-3 text-white border-white border px-3 py-1.5 hover:text-blue-500 hover:bg-white  transition-all  duration-200"
+                className="mx-3 text-white border-white border border-b-3 rounded-b-sm px-3 py-1.5 hover:text-blue-500 hover:bg-white  transition-all  duration-200"
               >
                 Connexion
               </button>
@@ -26,13 +35,16 @@ export default function NavBar() {
                 onClick={() => {
                   navigate("/inscription");
                 }}
-                className="mx-3 text-white border-white border px-3 py-1.5 hover:text-blue-500 hover:bg-white  transition-all  duration-200"
+                className="mx-3 text-white border-white border border-b-3 rounded-b-sm px-3 py-1.5 hover:text-blue-500 hover:bg-white  transition-all  duration-200"
               >
                 Inscription
               </button>
             </>
           ) : (
-            <button className="mx-3 text-white border-white border px-3 py-1.5 hover:text-blue-500 hover:bg-white  transition-all  duration-200">
+            <button
+              onClick={disconnect}
+              className="mx-3 text-white border-white border px-3 py-1.5 hover:text-blue-500 hover:bg-white  transition-all  duration-200"
+            >
               Déconnexion
             </button>
           )}

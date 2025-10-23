@@ -2,12 +2,16 @@ import { useState } from "react";
 import { loginUser } from "./loginApi";
 import { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
-import userStore from "../stores/userStore";
+import userStore from "../stores/globalStore";
+import { useNavigate } from "react-router";
+import globalStore from "../stores/globalStore";
 export default function Login() {
+  const navigate = useNavigate();
   const [error, setError] = useState({} as CustomError);
-  const [session, setSession] = useState({} as Session);
-  const { username, setUsername } = userStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const { session, setSession, clearSession } = globalStore();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    setIsLoading(true);
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
@@ -22,19 +26,25 @@ export default function Login() {
       (result: Session) => {
         console.log(result);
         setSession(result);
-        setUsername(username_input);
-        console.log("user logged in : ", username);
+        //setSession(result);
+        console.log("user logged in : ", result);
         form.reset();
         setError(new CustomError(""));
+
+        navigate("/home");
       },
       (loginError: CustomError) => {
+        setIsLoading(false);
         console.log(loginError);
         setError(loginError);
-        setSession({} as Session);
+        clearSession();
       }
     );
   };
-
+  const isLoggedIn = session.token != "";
+  if (isLoggedIn) {
+    navigate("/home");
+  }
   return (
     <div className="flex  flex-col justify-center items-center gap-5  border-blue-500 w-fit p-4 mx-auto ">
       <h1 className="font-bold text-blue-700 border-b-2 text-xl ">
@@ -78,6 +88,11 @@ export default function Login() {
         <span className="text-green-600 bg-green-200  px-2 py-1 rounded-lg">
           <strong className="underline">{session.username} </strong>:{" "}
           {session.token}
+        </span>
+      )}
+      {isLoading && (
+        <span className="text-yellow-600 bg-yellow-200 px-2 py-1 w-50 text-center rounded-lg">
+          loading ...
         </span>
       )}
       {error.message && (

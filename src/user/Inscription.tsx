@@ -1,36 +1,42 @@
 import { useState } from "react";
-import { loginUser } from "./loginApi";
 import { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
-import userStore from "../stores/userStore";
+import userStore from "../stores/globalStore";
+import { inscriptionUser } from "./inscriptionApi";
+import { useNavigate } from "react-router";
 export default function Inscription() {
+  const navigate = useNavigate();
   const [error, setError] = useState({} as CustomError);
-  const [session, setSession] = useState({} as Session);
-  const { username, setUsername } = userStore();
+  const { session, setSession } = userStore();
+  // handle inscription
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
+    // get form data
     const data = new FormData(form);
     const username_input = data.get("login") as string;
+    const email_input = data.get("email") as string;
     const password_input = data.get("password") as string;
-    loginUser(
+    inscriptionUser(
       {
         user_id: -1,
         username: username_input,
+        email: username_input,
         password: password_input,
       },
       (result: Session) => {
         console.log(result);
         setSession(result);
-        setUsername(username_input);
-        console.log("user logged in : ", username);
+
+        navigate("/home");
+        console.log("user logged in : ", result);
         form.reset();
         setError(new CustomError(""));
       },
       (loginError: CustomError) => {
         console.log(loginError);
         setError(loginError);
-        setSession({} as Session);
+        setSession({ token: "", externalId: "" } as Session);
       }
     );
   };
