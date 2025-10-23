@@ -11,7 +11,21 @@ export interface User {
     last_login?: string;
     external_id?: string;
 }
+export interface Conversation{
+    from:User,
+    to:User,
+    messages:Message[]
+}
+export interface RoomConversation{
+    messages:[]
+}
+export interface Room {
+    room_id: number;
+    name: string;
+    }
+export interface Message{
 
+}
 export interface Session {
     token: string;
     username?: string;

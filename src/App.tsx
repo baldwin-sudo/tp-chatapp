@@ -26,7 +26,7 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <NavBar />
-      <div id="main-container" className="<flex-1 ">
+      <div id="main-container" className="flex-1 w-auto mx-15 ">
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
