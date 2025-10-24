@@ -62,7 +62,6 @@ export default function Login() {
           <input
             className=" rounded-sm border border-b-3 rounded-br-xl outline-0 px-2 py-1 focus:scale-105 focus:border-blue-500 focus:text-blue-600 transition-all duration-200 placeholder:text-neutral-400 "
             name="login"
-            value={"test"}
             placeholder="..."
           />
         </label>
@@ -75,7 +74,6 @@ export default function Login() {
             className=" rounded-sm border border-b-3  rounded-br-xl outline-0 px-2 py-1 focus:scale-105 focus:border-blue-500 focus:text-blue-600 transition-all duration-200 placeholder:text-neutral-400 "
             name="password"
             type="password"
-            value={"testubo"}
             placeholder="..."
           />
         </label>

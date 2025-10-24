@@ -9,7 +9,7 @@ import Home from "./Pages/Home";
 import { useEffect } from "react";
 import globalStore from "./stores/globalStore";
 function App() {
-  const { setSession } = globalStore();
+  const { setSession, setUsersMessages } = globalStore();
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     const username = sessionStorage.getItem("username");
@@ -21,7 +21,22 @@ function App() {
       id: parseInt(id || "-1"),
       externalId: externalId || "",
     };
+
     setSession(session);
+    // set all user to user messages :
+    fetch("/api/message", {
+      headers: {
+        Authentication: `Bearer ${session.token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUsersMessages(data.userMessages);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch messages:", err);
+      });
   }, []);
   return (
     <div className="min-h-screen flex flex-col">

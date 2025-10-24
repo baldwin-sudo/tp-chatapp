@@ -17,6 +17,7 @@ export function loginUser(user: User, onResult: SessionCallback, onError: ErrorC
                 sessionStorage.setItem('token', session.token);
                 sessionStorage.setItem('externalId', session.externalId);
                 sessionStorage.setItem('username', session.username || "");
+                sessionStorage.setItem('id', String(session.id));
                 onResult(session)
             } else {
                   console.log("response  err:",response)

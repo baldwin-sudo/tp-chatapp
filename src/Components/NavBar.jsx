@@ -45,9 +45,9 @@ export default function NavBar() {
               <p className="text-white inline-flex items-center justify-center gap-2 font-bold mx-5">
                 {" "}
                 Hello, {session.username}
-                <div className="block bg-green-300 size-3 rounded-full">
+                <span className="block bg-green-300 size-3 rounded-full">
                   {" "}
-                </div>{" "}
+                </span>{" "}
                 <span className="text-sm font-light bg-green-300 text-green-700 rounded-sm px-1 py-0.5">
                   connected
                 </span>

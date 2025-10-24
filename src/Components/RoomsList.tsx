@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from "react";
 import globalStore from "../stores/globalStore";
 import { CustomError } from "../model/CustomError";
-import type { Room } from "../model/common";
+import type { Room, RoomConversation } from "../model/common";
 
 export default function RoomsList() {
   const { session } = globalStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<CustomError | null>(null);
   const [roomsList, setRoomsList] = useState<Room[]>([]);
+  const { setConversation } = globalStore();
+  const loadConversation = (room: Room) => {
+    const conversation: RoomConversation = {
+      room: room,
 
+      // add logic to fetch messages
+      messages: [],
+    };
+    setConversation(conversation);
+  };
   useEffect(() => {
     const fetchUsers = async () => {
       // Check if session token exists
@@ -32,7 +41,6 @@ export default function RoomsList() {
           const data: ResponseSchema = await response.json();
           // remove current user from list
 
-          console.log(data);
           setRoomsList(data);
         } else {
           const errorData = await response.json();
@@ -85,7 +93,12 @@ export default function RoomsList() {
               <div>
                 <span className="block font-semibold">{room.name}</span>
               </div>
-              <button className="border-2 px-2 py-2 rounded-sm text-white bg-blue-500    hover:bg-white hover:text-blue-500 transition-all duration-150 ">
+              <button
+                onClick={() => {
+                  loadConversation(room);
+                }}
+                className="border-2 px-2 py-2 rounded-sm text-white bg-blue-500    hover:bg-white hover:text-blue-500 transition-all duration-150 "
+              >
                 send message
               </button>
             </li>

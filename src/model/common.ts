@@ -4,10 +4,11 @@ export const AUTHENT_HEADER = "Authentication";
 export const BEARER = "Bearer ";
 
 export interface User {
+
     user_id: number;
     username: string;
     email?: string;
-    password: string;
+    password?: string;
     last_login?: string;
     external_id?: string;
 }
@@ -17,9 +18,17 @@ export interface Conversation{
     messages:Message[]
 }
 export interface RoomConversation{
+    room:Room,
     messages:[]
 }
+export interface Message{
+      content:string,
+      destination_id:number,
+      sender_id:number,
+      timestamp:number
+    }
 export interface Room {
+
     room_id: number;
     name: string;
     }
@@ -28,8 +37,8 @@ export interface Message{
 }
 export interface Session {
     token: string;
-    username?: string;
-    id?: number;
+    username: string;
+    id: number;
     externalId: string;
 }
 

@@ -1,25 +1,33 @@
 import React, { useEffect, useState } from "react";
 import globalStore from "../stores/globalStore";
 import { CustomError } from "../model/CustomError";
-
-interface User {
-  user_id: number;
-  username: string;
-  last_login: string;
-}
+import { Conversation, User } from "../model/common";
 
 export default function UsersList() {
-  const { session } = globalStore();
+  const { session, currentConversation, setConversation, users, setUsers } =
+    globalStore();
+  const loadConversation = (to: User) => {
+    const conversation: Conversation = {
+      to: to,
+      from: {
+        user_id: session.id,
+        username: session.username,
+      },
+      // add logic to fetch messages
+      messages: [],
+    };
+    setConversation(conversation);
+  };
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<CustomError | null>(null);
-  const [usersList, setUsersList] = useState<User[]>([]);
+  const [] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       // Check if session token exists
       if (!session?.token) {
         setError(new CustomError("No session token available"));
-        return;
+        // Removed unused local state for users, as users are managed by globalStore
       }
 
       try {
@@ -40,7 +48,7 @@ export default function UsersList() {
             (user) => user.username != session.username
           );
           console.log(filteredList);
-          setUsersList(filteredList);
+          setUsers(filteredList);
         } else {
           const errorData = await response.json();
           setError(
@@ -78,13 +86,13 @@ export default function UsersList() {
         </div>
       )}
 
-      {!isLoading && !error && usersList.length === 0 && (
+      {!isLoading && !error && users.length === 0 && (
         <p className="text-gray-500">No users found</p>
       )}
 
-      {!isLoading && !error && usersList.length > 0 && (
+      {!isLoading && !error && users.length > 0 && (
         <ul className="">
-          {usersList.map((user) => (
+          {users.map((user) => (
             <li
               key={user.user_id}
               className="border border-blue-100  rounded p-3 hover:bg-gray-50 transition flex  justify-between"
@@ -95,7 +103,12 @@ export default function UsersList() {
                   Last login: {user.last_login}
                 </span>
               </div>
-              <button className="border-2 px-2 rounded-sm text-white bg-blue-500    hover:bg-white hover:text-blue-500 transition-all duration-150 ">
+              <button
+                onClick={() => {
+                  loadConversation(user);
+                }}
+                className="border-2 px-2 rounded-sm text-white bg-blue-500    hover:bg-white hover:text-blue-500 transition-all duration-150 "
+              >
                 send message
               </button>
             </li>
