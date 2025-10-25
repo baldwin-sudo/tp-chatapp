@@ -1,11 +1,15 @@
+
 import { getConnectedUser, triggerNotConnected } from "../lib/session";
 import { Redis } from "@upstash/redis";
-// const PushNotifications = require("@pusher/push-notifications-server");
+import PushNotifications from "@pusher/push-notifications-server";
 const redis = Redis.fromEnv();
-interface User{
-  user_id:number
-}
+export interface User {
 
+    id: number;
+    username: string;
+    token:string;
+    externalId: string;
+}
 interface Message {
   content: string;
   sender_id: number;
@@ -21,8 +25,8 @@ export async function POST(request, response) {
     
     if (user === undefined || user === null) {
       console.log("Not connected");
-      triggerNotConnected(response);
-      return;
+      return triggerNotConnected(response);
+
     }
 
     interface ReqSchema {
@@ -38,18 +42,97 @@ export async function POST(request, response) {
     if (data.type === "user") {
       const { content, to } = data;
       console.log("content",content)
+      if (typeof to !== "number") {
+        return new Response(
+          JSON.stringify({ error: "'to' (destination user id) is required and must be a number" }),
+          {
+            status: 400,
+            headers: { "content-type": "application/json" },
+          }
+        );
+      }
       let conversation_id = [user.id, to].sort((a, b) => a - b).join("_");
       console.log(conversation_id);
       
+      // Retrieve full user objects from Redis hash map
+      const senderUserRaw = await redis.hget("users", user.id.toString());
+      const senderUser = typeof senderUserRaw === "string" ? JSON.parse(senderUserRaw) as User : senderUserRaw as User;
+    const destinationUserObjRaw = await redis.hget("users", to.toString());
+
+if (!destinationUserObjRaw) {
+  return new Response(
+    JSON.stringify({ error: "Destination user not found" }),
+    { status: 400, headers: { "content-type": "application/json" } }
+  );
+}
+
+let destinationUserObj: User;
+
+try {
+  // Handle both stringified and already-object cases
+  if (typeof destinationUserObjRaw === "object" && destinationUserObjRaw !== null) {
+    destinationUserObj = destinationUserObjRaw as User;
+  } else if (typeof destinationUserObjRaw === "string") {
+    destinationUserObj = JSON.parse(destinationUserObjRaw) as User;
+  } else {
+    throw new Error("Unexpected Redis value type");
+  }
+
+  if (
+    !destinationUserObj ||
+    typeof destinationUserObj.id !== "number" ||
+    typeof destinationUserObj.username !== "string"
+  ) {
+    throw new Error("Invalid user object structure");
+  }
+
+  console.log("Parsed destination user:", destinationUserObj);
+} catch (err) {
+  console.error(" Error parsing destination user:", err);
+  return new Response(
+    JSON.stringify({
+      error: "Invalid destination user data",
+      raw: destinationUserObjRaw,
+    }),
+    {
+      status: 400,
+      headers: { "content-type": "application/json" },
+    }
+  );
+}
+       
+
       const message: Message = {
         content,
-        destination_id:to||-1,
-        sender_id: user.id,
+        destination_id: destinationUserObj.id ?? to,
+        sender_id: senderUser.id ?? user.id,
         timestamp: Date.now()
       };
       
       console.log("message:", JSON.stringify(message));
       await redis.lpush(conversation_id, JSON.stringify(message));
+      // notifications 
+      const beamsClient = new PushNotifications({
+   instanceId:
+      process.env.PUSHER_INSTANCE_ID || "1e9e0849-a055-4aa6-b8a3-61736719f027",
+    secretKey:
+      process.env.PUSHER_SECRET_KEY ||
+      "175C2318414809BBF1B6D5EE9B56018066DDD8F529C941A07FDE380B5B9EB1EE",
+ });
+ console.log("destination after parse",destinationUserObj)
+// publish to users
+//  const publishResponse = await beamsClient.publishToInterests.publishToUsers([destinationUserObj.externalId], {
+      const publishResponse = await beamsClient.publishToInterests(["debug-global"], {
+    web: {
+        notification: {
+            title: senderUser.username,
+            body: message.content,
+              },
+        data: {
+            /* additionnal data */
+        }
+    },
+});
       return new Response(
         JSON.stringify({
           message

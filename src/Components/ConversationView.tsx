@@ -110,10 +110,36 @@ function ConversationView() {
    */
 
   // Fetch when component mounts or when user sends a message
-  useEffect(() => {
-    fetchMessages();
-  }, [message]);
+  // useEffect(() => {
+  //   fetchMessages();
+  // }, [messae]);
+  // service worker :
+  const fetchAfterPusherSuccess = async () => {
+    try {
+      // Fetch room messages
+      const res = await fetch("/api/message", {
+        headers: { Authorization: `Bearer ${session.token}` },
+      });
+      const allMessages = await res.json();
 
+      // Set messages in globalStore (assuming you have setters)
+      setRoomsMessages(allMessages.roomsMessages);
+      setUsersMessages(allMessages.usersMessages);
+
+      console.log("Fetched and set room and user messages");
+    } catch (err) {
+      console.error("Error fetching messages:", err);
+    }
+  };
+  useEffect(() => {
+    const sw = navigator.serviceWorker;
+    if (sw != null) {
+      sw.onmessage = (event) => {
+        console.log("Got event from sw : " + event.data);
+        fetchMessages();
+      };
+    }
+  }, []);
   // Filter messages when store updates
   useEffect(() => {
     if (!currentConversation) {
@@ -172,54 +198,61 @@ function ConversationView() {
 
       {/* Messages */}
       <div className="h-130 overflow-y-auto px-4 py-2">
-        {Array.isArray(conversationMessages) &&
-        conversationMessages.length === 0 ? (
-          <p className="text-gray-500">No messages yet.</p>
-        ) : (
-          Array.isArray(conversationMessages) &&
-          conversationMessages.map((msg, idx) => (
-            <div
-              key={msg.id || idx}
-              className={`flex mb-2 ${
-                msg.sender_id === session.id ? "justify-end" : "justify-start"
-              }`}
-            >
-              <div className="flex flex-col max-w-xs">
-                {/* Show sender name if it's a room conversation and not the current user */}
-                {"room" in currentConversation &&
-                  msg.sender_id !== session.id && (
-                    <span className="text-xs text-left text-green-700 font-semibold mb-1">
-                      {/*  TODO:   fetch users names */}
-                      {users.find((user) => user.user_id == msg.sender_id)
-                        ?.username ||
-                        "id: " + msg.sender_id ||
-                        "Unknown"}
-                    </span>
-                  )}
-                <div
-                  className={`px-4 py-2 rounded-lg shadow ${
-                    msg.sender_id === session.id
-                      ? "bg-green-200 text-green-900"
-                      : "bg-blue-200 text-blue-900"
-                  }`}
-                  style={{ wordBreak: "break-word" }}
-                >
-                  {msg.content}
+        <div
+          ref={(el) => {
+            if (el) el.scrollTop = el.scrollHeight;
+          }}
+          style={{ height: "100%", overflowY: "auto" }}
+        >
+          {Array.isArray(conversationMessages) &&
+          conversationMessages.length === 0 ? (
+            <p className="text-gray-500">No messages yet.</p>
+          ) : (
+            Array.isArray(conversationMessages) &&
+            conversationMessages.map((msg, idx) => (
+              <div
+                key={msg.id || idx}
+                className={`flex mb-2 ${
+                  msg.sender_id === session.id ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div className="flex flex-col max-w-xs">
+                  {/* Show sender name if it's a room conversation and not the current user */}
+                  {"room" in currentConversation &&
+                    msg.sender_id !== session.id && (
+                      <span className="text-xs text-left text-green-700 font-semibold mb-1">
+                        {/*  TODO:   fetch users names */}
+                        {users.find((user) => user.user_id == msg.sender_id)
+                          ?.username ||
+                          "id: " + msg.sender_id ||
+                          "Unknown"}
+                      </span>
+                    )}
+                  <div
+                    className={`px-4 py-2 rounded-lg shadow ${
+                      msg.sender_id === session.id
+                        ? "bg-green-200 text-green-900"
+                        : "bg-blue-200 text-blue-900"
+                    }`}
+                    style={{ wordBreak: "break-word" }}
+                  >
+                    {msg.content}
+                  </div>
+                  <span
+                    className={`text-xs text-neutral-400 ${
+                      msg.sender_id === session.id ? "text-right" : "text-left"
+                    }`}
+                  >
+                    {new Date(msg.timestamp).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
                 </div>
-                <span
-                  className={`text-xs text-neutral-400 ${
-                    msg.sender_id === session.id ? "text-right" : "text-left"
-                  }`}
-                >
-                  {new Date(msg.timestamp).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
 
       {/* Input */}

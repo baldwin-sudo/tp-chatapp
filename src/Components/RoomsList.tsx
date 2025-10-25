@@ -88,7 +88,7 @@ export default function RoomsList() {
           {roomsList.map((room) => (
             <li
               key={room.name}
-              className="border border-blue-100  rounded p-3 hover:bg-gray-50 transition flex  justify-between"
+              className="border border-blue-100  rounded p-2 hover:bg-gray-50 transition flex  justify-between"
             >
               <div>
                 <span className="block font-semibold">{room.name}</span>

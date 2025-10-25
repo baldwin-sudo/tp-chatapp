@@ -95,7 +95,7 @@ export default function UsersList() {
           {users.map((user) => (
             <li
               key={user.user_id}
-              className="border border-blue-100  rounded p-3 hover:bg-gray-50 transition flex  justify-between"
+              className="border border-blue-100  rounded p-2 hover:bg-gray-50 transition flex  justify-between"
             >
               <div>
                 <span className="block font-semibold">{user.username}</span>
